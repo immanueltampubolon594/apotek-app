@@ -1,22 +1,10 @@
-import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { useFonts } from 'expo-font';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { useColorScheme } from '@/components/useColorScheme';
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Tetap panggil di luar untuk mencegah blink
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -24,33 +12,42 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
+    if (loaded || error) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, error]);
 
-  if (!loaded) {
+  // Sangat penting di SDK 56: Jangan render Navigator jika font belum load
+  // agar internal hooks expo-router tidak "bingung" dengan state React 19
+  if (!loaded && !error) {
     return null;
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerShown: false }}>
+       <Stack.Screen name="welcome" />
+        <Stack.Screen name="(auth)/login" />
+       
+        <Stack.Screen name="obat/[id]" options={{ headerShown: true, title: 'Detail' }} />
+        <Stack.Screen name="transaksi/keranjang" options={{ headerShown: true, title: 'Keranjang' }} />
+        <Stack.Screen name="transaksi/bayar" options={{ headerShown: true, title: 'Checkout' }} />
+        <Stack.Screen name="profile/edit" options={{ title: 'Edit Profile' }} />
+        <Stack.Screen name="profile/address" options={{ title: 'Alamat Saya' }} />
+        <Stack.Screen name="profile/payments" options={{ title: 'Metode Pembayaran' }} />
+        <Stack.Screen name="profile/wishlist" options={{ title: 'Wishlist Saya' }} />
+        <Stack.Screen name="profile/privacy" options={{ title: 'Kebijakan Privasi' }} />
+        <Stack.Screen name="profile/help" options={{ title: 'Bantuan' }} />
+        <Stack.Screen name="articles/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="transaksi/payment-page" options={{ title: 'Pembayaran', headerShown: true }} />
+        <Stack.Screen name="admin/dashboard" />
+        <Stack.Screen name="admin/add-obat" options={{ title: 'Tambah Obat' }} />
+        <Stack.Screen name="ai/interaksi" options={{ title: 'AI Drug Checker', headerShown: true }} />
+        <Stack.Screen name="admin/manage-stock" options={{ title: 'Kelola Stok' }} />
+        <Stack.Screen name="admin/add-article" options={{ title: 'Tambah Artikel' }} />
+        <Stack.Screen name="admin/manage-articles" options={{ headerShown: false }} />
       </Stack>
-    </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

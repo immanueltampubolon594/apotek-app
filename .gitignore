@@ -39,3 +39,18 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Laravel backend
+backend/vendor/
+backend/.env
+backend/storage/*.key
+backend/node_modules/
+
+# FastAPI ai-service
+ai-service/venv/
+ai-service/.venv/
+ai-service/__pycache__/
+ai-service/.env
+
+# general env files
+.env
