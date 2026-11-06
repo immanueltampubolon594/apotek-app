@@ -42,6 +42,40 @@ A full-stack mobile pharmacy app — medicine catalog, order management, and an 
 | **AI Service** | FastAPI · Python | AI-powered features |
 
 ---
+## 🏗️ Architecture
+
+```mermaid
+flowchart TB
+    subgraph MOB["📱 MOBILE APP · React Native + Expo"]
+        direction LR
+        AUTH["Auth\nLogin / Register"]
+        CAT["Medicine Catalog"]
+        ORD["Orders & History"]
+        CHAT["Chat / Messaging"]
+        ART["Health Articles"]
+        PROF["User Profile"]
+        AUTH ~~~ CAT ~~~ ORD ~~~ CHAT ~~~ ART ~~~ PROF
+    end
+
+    subgraph BE["⚙️ BACKEND · Laravel (PHP)"]
+        direction LR
+        API["REST API"]
+        CTRL["Controllers\nBusiness Logic"]
+        DB[("MySQL Database")]
+        API --> CTRL --> DB
+    end
+
+    subgraph AI["🤖 AI SERVICE · FastAPI (Python)"]
+        direction LR
+        AIEP["AI Endpoints"]
+        MODEL["AI Model / Logic"]
+        AIEP --> MODEL
+    end
+
+    MOB -->|"HTTP REST"| API
+    MOB -->|"AI requests"| AIEP
+    CTRL -->|"AI processing"| AIEP
+```
 
 ## 🚀 Quick Start
 
